@@ -1,12 +1,21 @@
 #include <iostream>
-#include "adder.h"
 #include "GLFW/glfw3.h"
 #include "TutorialConfig.h"
-
+#ifdef USE_ADDER
+#include "adder.h"
+#endif
 int main(int argc, char* argv[])
 {
 
 	std::cout << argv[0] << " Version " << Tutorial_VERSION_MAJOR << "."<< Tutorial_VERSION_MINOR << "\n";
+
+
+#ifdef USE_ADDER
+
+	std::cout << "use adder lib"<< Add(1,2) << "\n";
+#else
+	std::cout << 1+2<<"\n";
+#endif
 
 	GLFWwindow *window;
 	if(!glfwInit())

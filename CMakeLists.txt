@@ -3,13 +3,23 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name and version
 project(Tutorial VERSION 1.0)
 
-add_executable(Tutorial src/main.cpp)
+# adder use logic
+option(USE_ADDER "A simple library for adding 2 int" ON)
+if(USE_ADDER)
+	add_subdirectory(src/Adder)
+	list(APPEND EXTRA_LIB_DIRS "${PROJECT_SOURCE_DIR}/src/Adder")
+	list(APPEND EXTRA_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/Adder")
+	list(APPEND EXTRA_LINKS PUBLIC adder)
+endif()
+
 
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 
+add_executable(Tutorial src/main.cpp)
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR})
 
-add_subdirectory(src/Adder)
+
 
 # download all the submodules
 find_package(Git QUIET)
@@ -35,17 +45,18 @@ endif()
 add_subdirectory(external/glfw)
 
 target_include_directories(Tutorial 
-	PUBLIC src/Adder
 	PUBLIC external/glfw/include	
+	${EXTRA_INCLUDE_DIRS}
 	)
 
 target_link_directories(Tutorial 
-	PRIVATE src/Adder
 	PRIVATE external/glfw/src
+	${EXTRA_LIB_DIRS}
 	)
 
-target_link_libraries(Tutorial PUBLIC adder PUBLIC glfw)
+target_link_libraries(Tutorial ${EXTRA_LINKS} PUBLIC glfw)
 
 find_package(imgui CONFIG REQUIRED)
+
 target_link_libraries(Tutorial PRIVATE imgui::imgui)
 

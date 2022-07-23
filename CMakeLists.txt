@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name and version
-project(Tutorial)
+project(Tutorial VERSION 1.0)
 
 add_executable(Tutorial src/main.cpp)
+
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR})
 
 add_subdirectory(src/Adder)
 
@@ -11,12 +15,12 @@ add_subdirectory(src/Adder)
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 # update submodules as needed
-	option(GIT_SUBMODULES "Check submodules during build" ON)
-	if(GIT_SUBMODULES)
+	option(GIT_SUBMODULE "Check submodules during build" ON)
+	if(GIT_SUBMODULE)
 		message(STATUS "Submodule Update")
-		execute_process(COMMAND ${GIT EXECUTABLE} submodule update --init --recursive
+		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
 						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-						RESULT_VARIABLE GIT_SUBMODULE_RESULT)
+						RESULT_VARIABLE GIT_SUBMOD_RESULT)
 		if(NOT GIT_SUBMOD_RESULT EQUAL "0")	
 			message(FATAL_ERROR "git module update --init failed with ${GIT_SUBMOD_RESULT},please checkout submodule")
 		endif()
@@ -24,7 +28,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 #CHECK ALL THE MODULES
-if(NOT EXIST "${PROJECT_SOURCE_DIR}/external/glfw/CMakelists.txt")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/glfw/CMakelists.txt")
 	message(FATAL_EROR "The glfw submodules was not downloaded! GIT_SUBMODULE was turned off or failed ")
 endif()
 

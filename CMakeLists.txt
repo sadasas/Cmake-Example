@@ -3,22 +3,23 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name and version
 project(Tutorial VERSION 1.0)
 
-# adder use logic
-option(USE_ADDER "A simple library for adding 2 int" ON)
-if(USE_ADDER)
-	add_subdirectory(src/Adder)
-	list(APPEND EXTRA_LIB_DIRS "${PROJECT_SOURCE_DIR}/src/Adder")
-	list(APPEND EXTRA_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/Adder")
-	list(APPEND EXTRA_LINKS PUBLIC adder)
-endif()
-
-
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 
-add_executable(Tutorial src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_BINARY_DIR})
 
+  
+#adder
+option(USE_ADDER "tes" ON)
+if(USE_ADDER)
+	add_subdirectory(src/Adder)
+	list(APPEND EXTRA_LIBS_DIRS PUBLIC "src/adder")
+	list(APPEND EXTRA_INCLUDES_DIRS "src/Adder")
+	list(APPEND EXTRA_LINKS_DIRS adder)
+	
+
+endif()
 
 
 # download all the submodules
@@ -42,21 +43,19 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/glfw/CMakelists.txt")
 	message(FATAL_EROR "The glfw submodules was not downloaded! GIT_SUBMODULE was turned off or failed ")
 endif()
 
+#glfw
 add_subdirectory(external/glfw)
+target_include_directories(
+	${PROJECT_NAME} PUBLIC external/glfw/include
+	${EXTRA_INCLUDES_DIRS})
+	
+target_link_directories(
+	${PROJECT_NAME} PRIVATE external/glfw
+	${EXTRA_LIBS_DIRS})
 
-target_include_directories(Tutorial 
-	PUBLIC external/glfw/include	
-	${EXTRA_INCLUDE_DIRS}
-	)
+target_link_libraries(
+	${PROJECT_NAME} PUBLIC glfw
+	${EXTRA_LINKS_DIRS})
 
-target_link_directories(Tutorial 
-	PRIVATE external/glfw/src
-	${EXTRA_LIB_DIRS}
-	)
-
-target_link_libraries(Tutorial ${EXTRA_LINKS} PUBLIC glfw)
-
-find_package(imgui CONFIG REQUIRED)
-
-target_link_libraries(Tutorial PRIVATE imgui::imgui)
-
+	install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+	install(FILES ${PROJECT_BINARY_DIR}/TutorialConfig.h DESTINATION include)

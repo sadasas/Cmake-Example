@@ -1,1 +1,1 @@
-cmake -DUSE_ADDER=OFF -B build\ -S . 
+cmake -B build\ -S . -DCMAKE_TOOLCHAIN_FILE=E:\C++\vcpkg\scripts\buildsystems\vcpkg.cmake
